@@ -1,0 +1,80 @@
+CREATE DATABASE test0709;
+USE test0709;
+
+CREATE TABLE `User` (
+    `User_Id` int NOT NULL,
+    `username` varchar(30) NULL,
+    `password` varchar(30) NULL,
+    `phone_number` varchar(30) NULL,
+    `email` varchar(30) NULL,
+    `profile_img` varchar(255) NULL,
+    `is_superuser` Boolean NULL,
+    PRIMARY KEY (`User_Id`)
+);
+
+CREATE TABLE `Parking_Area_Info` (
+    `Parking_Area_Info_Id` int NOT NULL,
+    `name` varchar(30) NULL,
+    `GPS_location` Point NULL,
+    `Structure` varchar(255) NULL,
+    PRIMARY KEY (`Parking_Area_Info_Id`)
+);
+
+CREATE TABLE `Car_Info` (
+    `Car_Info_Id` int NOT NULL,
+    `User_Id` int NOT NULL,
+    `Car_number` varchar(30) NULL,
+    PRIMARY KEY (`Car_Info_Id`, `User_Id`),
+    FOREIGN KEY (`User_Id`) REFERENCES `User` (`User_Id`)
+);
+
+CREATE TABLE `Robot_Info` (
+    `Robot_Info_Id` int NOT NULL,
+    `Parking_Area_Info_Id` int NOT NULL,
+    `State` Boolean NULL,
+    PRIMARY KEY (`Robot_Info_Id`, `Parking_Area_Info_Id`),
+    FOREIGN KEY (`Parking_Area_Info_Id`) REFERENCES `Parking_Area_Info` (`Parking_Area_Info_Id`)
+);
+
+CREATE TABLE `Parking_Coordinate_Info` (
+    `Parking_Coordinate_Info_Id` int NOT NULL,
+    `Parking_Area_Info_Id` int NOT NULL,
+    `Idx` varchar(30) NULL,
+    `Coordiante_XY` Point NULL,
+    `Coordiante_Z` int NULL,
+    `Front_Coordiante_XY` Point NULL,
+    `Front_Coordiante_ZW` Point NULL,
+    PRIMARY KEY (`Parking_Coordinate_Info_Id`, `Parking_Area_Info_Id`),
+    FOREIGN KEY (`Parking_Area_Info_Id`) REFERENCES `Parking_Area_Info` (`Parking_Area_Info_Id`)
+);
+
+CREATE TABLE `Robot_Log` (
+    `Robot_Log_Id` int NOT NULL,
+    `Robot_Info_Id` int NOT NULL,
+    `Parking_Area_Info_Id` int NOT NULL,
+    `State` varchar(30) NULL,
+    `Robot_Coordinate_XY` Point NULL,
+    `Robot_Coordinate_Z` int NOT NULL,
+    `Robot_Front_Coordinate_XY` Point NULL,
+    `Robot_Front_Coordinate_ZW` Point NULL,
+    `Time` Date NULL,
+    PRIMARY KEY (`Robot_Log_Id`, `Robot_Info_Id`, `Parking_Area_Info_Id`),
+    FOREIGN KEY (`Robot_Info_Id`) REFERENCES `Robot_Info` (`Robot_Info_Id`),
+    FOREIGN KEY (`Parking_Area_Info_Id`) REFERENCES `Robot_Info` (`Parking_Area_Info_Id`)
+);
+
+CREATE TABLE `Working_Schedule` (
+    `Working_Schedule_Id` int NOT NULL,
+    `User_Id` int NOT NULL,
+    `Car_Info_Id` int NOT NULL,
+    `Parking_Coordinate_Info_Id` int NOT NULL,
+    `Parking_Area_Info_Id` int NOT NULL,
+    `Charge_Time` int NULL,
+    `Is_Finished` Boolean NULL,
+    `Time` Date NULL,
+    PRIMARY KEY (`Working_Schedule_Id`, `User_Id`, `Car_Info_Id`, `Parking_Coordinate_Info_Id`, `Parking_Area_Info_Id`),
+    FOREIGN KEY (`User_Id`) REFERENCES `Car_Info` (`User_Id`),
+    FOREIGN KEY (`Car_Info_Id`) REFERENCES `Car_Info` (`Car_Info_Id`),
+    FOREIGN KEY (`Parking_Coordinate_Info_Id`) REFERENCES `Parking_Coordinate_Info` (`Parking_Coordinate_Info_Id`),
+    FOREIGN KEY (`Parking_Area_Info_Id`) REFERENCES `Parking_Coordinate_Info` (`Parking_Area_Info_Id`)
+);
